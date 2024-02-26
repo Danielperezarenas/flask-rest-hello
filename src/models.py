@@ -58,6 +58,16 @@ class Address(db.Model):
     users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     users = db.relationship(Users)
 
+    def __repr__(self):
+        return '<Address: %r>' % self.street_name % self.street_number
+
+    def serialize(self):
+        return {"id": self.id, 
+                "street_name": self.street_name,
+                "street_number": self.street_number,
+                "post_code": self.post_code,
+                "users_id": self.users_id}
+
 
 class Characters(db.Model):
     __tablename__ = 'characters'
@@ -73,6 +83,23 @@ class Characters(db.Model):
     gender = db.Column(db.String)
     homeworld = db.Column(db.String)
     url = db.Column(db.String)
+
+    def __repr__(self):
+        return '<Character: %r>' % self.name
+
+    def serialize(self):
+        return {"id": self.id, 
+                "name": self.name,
+                "description": self.description,
+                "height": self.height,
+                "mass": self.mass,
+                "hair_color": self.hair_color,
+                "skin_color": self.skin_color,
+                "eye_color": self.eye_color,
+                "birth_year": self.birth_year,
+                "gender": self.gender,
+                "homeworld": self.homeworld,
+                "url": self.url}
 
 
 class Planets(db.Model):
@@ -90,6 +117,23 @@ class Planets(db.Model):
     surface_water = db.Column(db.String)
     url = db.Column(db.String)
 
+    def __repr__(self):
+        return '<Planet: %r>' % self.name
+
+    def serialize(self):
+        return {"id": self.id, 
+                "name": self.name,
+                "description": self.description,
+                "diameter": self.diameter,
+                "rotation_period": self.rotation_period,
+                "orbital_period": self.orbital_period,
+                "gravity": self.gravity,
+                "population": self.population,
+                "climate": self.climate,
+                "terrain": self.terrain,
+                "surface_water": self.surface_water,
+                "url": self.url}
+
 
 class FavoritesCharacters(db.Model):
     __tablename__ = 'favorites_characters'
@@ -99,6 +143,14 @@ class FavoritesCharacters(db.Model):
     users = db.relationship(Users)
     characters = db.relationship(Characters)
 
+    def __repr__(self):
+        return '<Favorites Characters: %r>' % self.users_id % self.characters_id
+
+    def serialize(self):
+        return {"id": self.id, 
+                "users_id": self.users_id,
+                "characters_id": self.characters_id}
+
 
 class FavoritesPlanets(db.Model):
     __tablename__ = 'favorites_planets'
@@ -107,3 +159,30 @@ class FavoritesPlanets(db.Model):
     planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
     users = db.relationship(Users)
     planets = db.relationship(Planets)
+
+    def __repr__(self):
+        return '<Favorites Planets: %r>' % self.users_id % self.planets_id
+
+    def serialize(self):
+        return {"id": self.id, 
+                "users_id": self.users_id,
+                "planets_id": self.planets_id}
+
+class Favorites(db.Model):
+    __tablename__ = 'favorites'
+    id = db.Column(db.Integer, primary_key=True)
+    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    users = db.relationship(Users)
+    planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
+    planets = db.relationship(Planets)
+    characters_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
+    characters = db.relationship(Characters)
+
+    def __repr__(self):
+        return '<Favorites %r>' % self.id % self.user_id
+
+    def serialize(self):
+        return {"id": self.id,
+                "user_id": self.user_id,
+                "planet_id": self.planet_id,
+                "people_id": self.people_id}

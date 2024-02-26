@@ -8,8 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, Users
-#from models import Person
+from models import db, Users, Characters, Planets, FavoritesCharacters, FavoritesPlanets, Favorites
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -102,6 +101,100 @@ def handle_user(user_id):
         response_body['message'] = 'Usuario eliminado'
         return response_body, 200
 
+
+@app.route('/people', methods=['GET'])
+def handle_characters():
+    response_body = {}
+    results = {}
+    characters = db.session.execute(db.select(Characters)).scalars()
+    list_characters = []
+    for row in characters:
+        list_characters.append(row.serialize())
+    results['characters'] = list_characters
+    response_body['message'] = 'Listado de Personajes'
+    response_body['results'] = results
+    return response_body, 200
+    
+
+@app.route('/people/<int:characters_id>', methods=['GET'])
+def handle_character(characters_id):
+    response_body = {}
+    results = {}
+    character = db.session.get(Characters, characters_id)
+    if not character:
+        response_body['message'] = 'Personaje no existe'
+        return response_body, 404
+    results['character'] = character.serialize()
+    response_body['message'] = 'Personaje encontrado'
+    response_body['results'] = results
+    return response_body, 200
+
+
+@app.route('/planets', methods=['GET'])
+def handle_planets():
+    response_body = {}
+    results = {}
+    planets = db.session.execute(db.select(Planets)).scalars()
+    list_planets = []
+    for row in planets:
+        list_planets.append(row.serialize())
+    results['planets'] = list_planets
+    response_body['message'] = 'Listado de Planetas'
+    response_body['results'] = results
+    return response_body, 200
+    
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def handle_one_planet(planet_id):
+    response_body = {}
+    results = {}
+    planets = db.session.get(Planets, planet_id)
+    if not planet:
+        response_body['message'] = 'Planeta no existe'
+        return response_body, 404
+    results['planet'] = planet.serialize()
+    response_body['message'] = 'Planeta encontrado'
+    response_body['results'] = results
+    return response_body, 200
+
+
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def handle_user_favorites(user_id):
+    response_body = {}
+    results = {}
+    favorites = db.session.execute(db.select(Favorites).where(Favorites.id == user_id)).scalar()
+    if not user_id:
+        response_body['message'] = 'Usuario no existe'
+        return response_body, 404
+    results['favorites'] = favorites
+    response_body['message'] = 'Lista de favoritos'
+    response_body['results'] = results
+    return response_body, 200
+
+
+# @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+# def handle_favorites_planets(user_id):
+#     data = request.json
+#     response_body = {}
+#     # Escribir la lógica para guardar el registro en la DB
+#     favorite_planet = planet_id.serialize()
+#     db.session.add(favorite)
+#     db.session.commit()
+#     response_body['user'] = user.serialize()
+#     return response_body, 200
+
+#     favorites = Favorites.query.filter_by(user_id == id).all()
+#     list_favorites = []
+#     for row in favorites:
+#         list_favorites.append(row.serialize())
+#     if not user_id:
+#         response_body['message'] = 'Usuario no existe'
+#         return response_body, 404
+#     results['favorites'] = list_favorites
+#     response_body['message'] = 'Lista de favoritos'
+#     response_body['results'] = results
+#     return response_body, 200
+    
 
 
 # this only runs if `$ python src/app.py` is executed
